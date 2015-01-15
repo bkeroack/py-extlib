@@ -1,11 +1,16 @@
 __author__ = 'bk'
 
+from typecheck import typecheck
+import typecheck as tc
 import zipfile
 import os
 import logging
 
-#create zip of a folder, prepending subpath to all archive paths if supplied
-def zipfolder(path, zipname, subpath=""):
+@typecheck
+def zipfolder(path: str, zipname: str, subpath: tc.optional(str)=""):
+    '''
+    Create zip of a folder, prepending subpath to all archive paths if supplied
+    '''
     assert os.path.isdir(path)
     empty_dirs = list()
     if os.path.exists(zipname):  # delete if exists
