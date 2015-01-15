@@ -7,7 +7,7 @@ Random snippets of code that I have found useful/essential.
 extlib.logging
 --------------
 
-```LoggingMetaClass```
+**LoggingMetaClass**
 
 Log the parameters and return value of every method call on class (debug log via logging.debug).
 
@@ -15,124 +15,132 @@ Log the parameters and return value of every method call on class (debug log via
 
 Usage:
 
-    from extlib.logging import LoggingMetaClass
-    
-    class MyClass:
-        __metaclass__ = LoggingMetaClass
-        
-        def count_msg(msg):
-            return len(msg)
-    
-    mc = MyClass()
-    mc.count_msg("foobar")
-    # debug log output:
-    # CALLING: count_msg (args: ["foobar"], kwargs: {})
-    # count_msg returned 6
+```python
+from extlib.logging import LoggingMetaClass
 
+class MyClass:
+    __metaclass__ = LoggingMetaClass
+    
+    def count_msg(msg):
+        return len(msg)
+
+mc = MyClass()
+mc.count_msg("foobar")
+# debug log output:
+# CALLING: count_msg (args: ["foobar"], kwargs: {})
+# count_msg returned 6
+```
 
 extlib.tree_tools
 -----------------
 
-```change_dict_keys(obj, char, rep)```
+**filter\_dict\_keys(obj, char, rep)**
 
-Given a nested dictionary object of arbitrary depth ```obj```, replace any instances of ```char``` found in keys with
-```rep```. 
+Given a nested dictionary object of arbitrary depth, replace any instances of ``char`` found in keys with
+``rep``. 
 
-**NOTE**: modifies ```obj``` in place (returns None).
-
-Example: (sanitizing nested dictionaries for MongoDB which does not allow '.' in keys):
-    
-    data = { "foo.bar": "baz.123" }
-    change_dict_keys(data, '.', '_')
-    print(data)
-    # { "foo_bar": "baz.123 }
-    
-
-
-```set_dict_key(obj, path, value)```
-
-Given a nested dictionary object of arbitrary depth ```obj```, walk ```path``` and insert ```value```.
-
-
-**NOTE**: modifies ```obj``` in place (returns None)
+**NOTE**: modifies ``obj`` in place (returns None).
 
 Example:
     
-    obj = {
-        'app': {
-            'myapp': { }
-        }
-    }
-    path = ('app', 'myapp', 'builds')
-    value = { 'foo': 'bar' }
-    set_dict_key(obj, path, value)
-    print(json.dumps(obj, indent=4))
-    #{
-    #    'app': {
-    #        'myapp': {
-    #            'builds': {
-    #                'foo': 'bar'
-    #            }
-    #        }
-    #    }
-    #}
+```python
+data = { "foo.bar": "baz.123" }
+change_dict_keys(data, '.', '_')
+print(data)
+# { "foo_bar": "baz.123 }
+```
+
+
+**insert\_node(obj, path, value)**
+
+Given a nested dictionary object of arbitrary depth ``obj``, walk ``path`` and insert ``value``.
+
+**NOTE**: modifies ``obj`` in place (returns None)
+
+Example:
+
+```python
+obj = {
+    'person': {
+        'mary': { }
+    },
+    'other': [1,2,3]
+}
+path = ('person', 'mary', 'contact_info')
+value = { 'phone': '123-456-7890' }
+insert_node(obj, path, value)
+print(json.dumps(obj, indent=4))
+#{
+#    "person": {
+#        "mary": {
+#            "contact_info": {
+#               "phone": "123-456-7890"
+#            }
+#        }
+#    },
+#    "other": [ 1, 2, 3 ]
+#}
+```
     
-**paths_from_nested_dict(obj, path=None)**
+**get\_paths(obj, path=None)**
 
 Given an arbitrarily-nested dict-like object, generate a list of unique tree path tuples.
 The last object in any path will be the deepest leaf value in that path.
 
 Example:
 
-    dict_obj = {
-        'a': {
-            0: 1,
-            1: 2
-        },
-        'b': {
-            'foo': 'bar'
-        }
+```python
+tree_obj = {
+    'a': {
+        0: 1,
+        1: 2
+    },
+    'b': {
+        'foo': 'bar'
     }
-
-    paths = paths_from_nested_dict(dict_obj)
-    # returns:
-    #[
-    #    ('a', 0, 1),
-    #    ('a', 1, 2),
-    #    ('b', 'foo', 'bar')
-    #]
-    
+}
+paths = paths_from_nested_dict(tree_obj)
+# returns:
+#[
+#    ('a', 0, 1),
+#    ('a', 1, 2),
+#    ('b', 'foo', 'bar')
+#]
+``` 
     
 extlib.seq_tools
 ----------------
 
-**flatten(list_obj)**
+**flatten(list\_obj)**
 
 Iterate through n-dimensional list yielding items
 
 Example:
 
-   my_list = [ "foo", [ 1, 2, (3,) ], "bar" ]
-   for i in flatten(my_list):
-       print(i)
-   # output:
-   # foo
-   # 1
-   # 2
-   # 3
-   # bar
+```python
+my_list = [ "foo", [ 1, 2, (3,) ], "bar" ]
+for i in flatten(my_list):
+   print(i)
+# output:
+# foo
+# 1
+# 2
+# 3
+# bar
+```
    
-**flatten_list(list_obj)**
+**flatten\_list(list\_obj)**
     
 Flatten n-dimensional list
 
 Example:
 
-   my_list = [ "foo", [ 1, 2, (3,) ], "bar" ]
-   flattened = flatten_list(my_list)
-   # returns:
-   # [ "foo", 1, 2, 3, "bar" ]
-   
+```python
+my_list = [ "foo", [ 1, 2, (3,) ], "bar" ]
+flattened = flatten_list(my_list)
+# returns:
+# [ "foo", 1, 2, 3, "bar" ]
+```
 
 extlib.zip
 ----------
@@ -143,25 +151,24 @@ Create zip archive of a directory ("folder"), preserving layout and filenames. P
 
 Example:
 
-   # Files:
-   # foo/a.txt
-   # foo/b.dat
-   # foo/data/c.dat
-   # foo/bar/baz/d.txt
-   
-   zipfolder("./foo", "foo_archive.zip")
-   
-   # foo_archive.zip contents:
-   # a.txt
-   # b.dat
-   # data/c.dat
-   # bar/baz/d.txt
-   
-   zipfolder("./foo", "foo_archive2.zip", "foobar/zzz")
-   
-   # foo_archive2.zip contents:
-   # foobar/zzza.txt
-   # foobar/zzzb.dat
-   # foobar/zzzdata/c.dat
-   # foobar/zzzbar/baz/d.txt
-   
+```python
+# Files:
+# foo/a.txt
+# foo/b.dat
+# foo/data/c.dat
+# foo/bar/baz/d.txt
+
+zipfolder("./foo", "foo_archive.zip")
+# foo_archive.zip contents:
+# a.txt
+# b.dat
+# data/c.dat
+# bar/baz/d.txt
+
+zipfolder("./foo", "foo_archive2.zip", "foobar/zzz/")
+# foo_archive2.zip contents:
+# foobar/zzz/a.txt
+# foobar/zzz/b.dat
+# foobar/zzz/data/c.dat
+# foobar/zzz/bar/baz/d.txt
+```
