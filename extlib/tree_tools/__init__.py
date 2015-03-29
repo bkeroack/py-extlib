@@ -44,3 +44,51 @@ def get_paths(obj: abc.MutableMapping, path: tc.optional(abc.MutableSequence)=No
         else:
             unique_paths.append(tuple(path + [item[0]] + [item[1]]))
     return unique_paths
+
+# tree = {
+#     '1': ['2', '3', '4'],
+#     '2': ['5', '6'],
+#     '5': ['9', '10'],
+#     '4': ['7', '8'],
+#     '7': ['11', '12']
+# }
+
+
+@typecheck
+def bfs(tree: dict, start: str, end: str) -> tc.optional(tc.seq_of(str)):
+    '''
+    Requires tree in adjacency list representation. Assumes no cycles.
+    '''
+    q = [[start]]
+    while q:
+        print("q: {}".format(q))
+        p = q.pop(0)
+        print("p: {}".format(p))
+        node = p[-1]
+        if node == end:
+            return p
+        for adj in tree.get(node, []):
+            print("adj: {}".format(adj))
+            np = list(p)
+            np.append(adj)
+            q.append(np)
+
+@typecheck
+def dfs(tree: dict, start: str, end: str) -> tc.optional(tc.seq_of(str)):
+    '''
+    Similar to above except DFS search
+    '''
+    s = [[start]]
+    while s:
+        print("s: {}".format(s))
+        p = s.pop()
+        print("p: {}".format(p))
+        node = p[-1]
+        if node == end:
+            return p
+        for adj in tree.get(node, []):
+            print("adj: {}".format(adj))
+            np = list(p)
+            np.append(adj)
+            s.append(np)
+
