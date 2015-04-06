@@ -45,18 +45,11 @@ def get_paths(obj: abc.MutableMapping, path: tc.optional(abc.MutableSequence)=No
             unique_paths.append(tuple(path + [item[0]] + [item[1]]))
     return unique_paths
 
-# tree = {
-#     '1': ['2', '3', '4'],
-#     '2': ['5', '6'],
-#     '5': ['9', '10'],
-#     '4': ['7', '8'],
-#     '7': ['11', '12']
-# }
-
 
 @typecheck
 def bfs(tree: dict, start: str, end: str) -> tc.optional(tc.seq_of(str)):
     '''
+    Breadth-first search.
     Requires tree in adjacency list representation. Assumes no cycles.
     '''
     q = [[start]]
@@ -76,7 +69,7 @@ def bfs(tree: dict, start: str, end: str) -> tc.optional(tc.seq_of(str)):
 @typecheck
 def dfs(tree: dict, start: str, end: str) -> tc.optional(tc.seq_of(str)):
     '''
-    Similar to above except DFS search
+    Similar to above except depth-first search
     '''
     s = [[start]]
     while s:
@@ -92,3 +85,20 @@ def dfs(tree: dict, start: str, end: str) -> tc.optional(tc.seq_of(str)):
             np.append(adj)
             s.append(np)
 
+
+@typecheck
+def adjacency_list(tree: dict) -> dict:
+    '''
+    Given a nested dictionary, return nodes in adjacency list format
+    '''
+    edges = {}
+    for item in tree.items():
+        if isinstance(item[1], dict):
+            keys = [k for k in item[1].keys()]
+            edges[item[0]] = edges[item[0]] + keys if item[0] in edges else keys
+            nested_edges = adjacency_list(item[1])
+            for ne in nested_edges:
+                edges[ne] = edges[ne] + nested_edges[ne] if ne in edges else nested_edges[ne]
+        else:
+            edges[item[0]] = edges[item[0]] + [item[1]] if item[0] in edges else [item[1]]
+    return edges
